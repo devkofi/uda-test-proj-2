@@ -41,12 +41,13 @@ export class User{
             await conn.connect();
             const sql = 'INSERT INTO users(name, email, password) VALUES ($1, $2, $3)';
             const result = await conn.query(sql,[signUp.name, signUp.email, signUp.password]);
+            const output = await conn.query('SELECT * FROM users WHERE email=($1)', [signUp.email]);
             conn.end();
-            console.log(result.rows)
-            return result.rows;
+            console.log(output.rows)
+            return output.rows;
 
         } catch (err) {
-            throw new Error(`Could not get books. Error: ${err}`)
+            throw new Error(`Could SignUp User. Error: ${err}`)
         }
         
     }
@@ -64,6 +65,17 @@ export class User{
         } catch (err) {
             throw new Error(`Could not get books. Error: ${err}`)
         }
+    }
+
+    async deleteUser(id: string): Promise<SignUp[]>{
+        const conn = this.connection();
+        await conn.connect();
+        const sql = 'DELETE FROM users WHERE id=($1)';
+        const result = await conn.query(sql, [id]);
+        const output = await conn.query('SELECT * FROM users');
+        conn.end();
+        console.log(output.rows);
+        return output.rows;
     }
 
 

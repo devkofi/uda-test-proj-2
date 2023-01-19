@@ -2,24 +2,24 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var express_1 = __importDefault(require("express"));
 var path_1 = __importDefault(require("path"));
 var cors_1 = __importDefault(require("cors"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var book_1 = __importDefault(require("./handler/book"));
 var user_1 = __importDefault(require("./handler/user"));
-var app = (0, express_1.default)();
+var app = (0, express_1["default"])();
 var port = 3000;
 var ENV = process.env.ENV;
-var rootFolder = path_1.default.resolve(__dirname) + path_1.default.normalize("/public/");
-app.use(express_1.default.static(rootFolder));
+var rootFolder = path_1["default"].resolve(__dirname) + path_1["default"].normalize("/public/");
+app.use(express_1["default"].static(rootFolder));
 //Enable cors for all routes
-app.use((0, cors_1.default)());
+app.use((0, cors_1["default"])());
 // parse application/x-www-form-urlencoded
-app.use(body_parser_1.default.urlencoded({ extended: false }));
+app.use(body_parser_1["default"].urlencoded({ extended: false }));
 // parse application/json
-app.use(body_parser_1.default.json());
+app.use(body_parser_1["default"].json());
 app.get('/', function (req, res) {
     res.sendFile(rootFolder + "index.html");
 });
@@ -29,8 +29,8 @@ app.get('/signin', function (req, res) {
 app.get('/signup', function (req, res) {
     res.sendFile(rootFolder + "signup.html");
 });
-(0, book_1.default)(app);
-(0, user_1.default)(app);
+(0, book_1["default"])(app);
+(0, user_1["default"])(app);
 app.listen(port, function () {
     console.log("Example app listening on port ".concat(port));
 });

@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var book_1 = require("../models/book");
 var ENV = process.env.ENV;
 var createBook = new book_1.Book(ENV);
@@ -85,7 +85,7 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
 var deleteBook = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var book;
     return __generator(this, function (_a) {
-        book = createBook.delete(req.params.id).then(function (item) {
+        book = createBook["delete"](req.params.id).then(function (item) {
             res.send('Successfully Deleted item');
         });
         return [2 /*return*/];
@@ -96,6 +96,6 @@ var book_routes = function (app) {
     app.get('/show', show);
     app.get('/update', update);
     app.post('/create', create);
-    app.delete('/delete/:id/', deleteBook);
+    app["delete"]('/delete/:id/', deleteBook);
 };
-exports.default = book_routes;
+exports["default"] = book_routes;

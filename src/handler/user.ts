@@ -13,14 +13,21 @@ const signIn = async (req: Request, res: Response): Promise<void> =>{
 }
 
 const signUp = async (req: Request, res: Response): Promise<void> =>{
-    const sign = user.signUp({name: req.body.name,email: req.body.email, password: req.body.password}).then((item)=>{
+    const sign = user.signUp({name: req.body.name, email: req.body.email, password: req.body.password}).then((item)=>{
         res.json(item);
     });
+}
+
+const deleteUser = async (req: Request, res:Response): Promise<void> =>{
+    const delUser = user.deleteUser(req.params.id).then((item)=>{
+        res.json(item);
+    })
 }
 
 const user_routes = (app: express.Application): void =>{
     app.post('/signin', signIn);
     app.post('/signup', signUp);
+    app.delete('/delete/:id', deleteUser);
 }
 
 export default user_routes;

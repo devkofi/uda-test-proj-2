@@ -38,11 +38,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.User = void 0;
 var dotenv_1 = __importDefault(require("dotenv"));
 var pg_1 = require("pg");
-dotenv_1.default.config();
+dotenv_1["default"].config();
 var _a = process.env, POSTGRES_HOST = _a.POSTGRES_HOST, POSTGRES_PORT = _a.POSTGRES_PORT, POSTGRES_DB = _a.POSTGRES_DB, POSTGRES_TEST_DB = _a.POSTGRES_TEST_DB, POSTGRES_USER = _a.POSTGRES_USER, POSTGRES_PASSWORD = _a.POSTGRES_PASSWORD, ENV = _a.ENV;
 console.log(ENV);
 var User = /** @class */ (function () {
@@ -50,11 +50,11 @@ var User = /** @class */ (function () {
     }
     User.prototype.signUp = function (signUp) {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, sql, result, err_1;
+            var conn, sql, result, output, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
+                        _a.trys.push([0, 4, , 5]);
                         conn = this.connection();
                         return [4 /*yield*/, conn.connect()];
                     case 1:
@@ -63,13 +63,16 @@ var User = /** @class */ (function () {
                         return [4 /*yield*/, conn.query(sql, [signUp.name, signUp.email, signUp.password])];
                     case 2:
                         result = _a.sent();
-                        conn.end();
-                        console.log(result.rows);
-                        return [2 /*return*/, result.rows];
+                        return [4 /*yield*/, conn.query('SELECT * FROM users WHERE email=($1)', [signUp.email])];
                     case 3:
+                        output = _a.sent();
+                        conn.end();
+                        console.log(output.rows);
+                        return [2 /*return*/, output.rows];
+                    case 4:
                         err_1 = _a.sent();
-                        throw new Error("Could not get books. Error: ".concat(err_1));
-                    case 4: return [2 /*return*/];
+                        throw new Error("Could SignUp User. Error: ".concat(err_1));
+                    case 5: return [2 /*return*/];
                 }
             });
         });
@@ -100,19 +103,43 @@ var User = /** @class */ (function () {
             });
         });
     };
+    User.prototype.deleteUser = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var conn, sql, result, output;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        conn = this.connection();
+                        return [4 /*yield*/, conn.connect()];
+                    case 1:
+                        _a.sent();
+                        sql = 'DELETE FROM users WHERE id=($1)';
+                        return [4 /*yield*/, conn.query(sql, [id])];
+                    case 2:
+                        result = _a.sent();
+                        return [4 /*yield*/, conn.query('SELECT * FROM users')];
+                    case 3:
+                        output = _a.sent();
+                        conn.end();
+                        console.log(output.rows);
+                        return [2 /*return*/, output.rows];
+                }
+            });
+        });
+    };
     User.prototype.connection = function () {
         var conn = ENV === "dev" ? new pg_1.Pool({
             host: POSTGRES_HOST,
             port: Number(POSTGRES_PORT),
             database: POSTGRES_DB,
             user: POSTGRES_USER,
-            password: POSTGRES_PASSWORD,
+            password: POSTGRES_PASSWORD
         }) : new pg_1.Pool({
             host: POSTGRES_HOST,
             port: Number(POSTGRES_PORT),
             database: POSTGRES_TEST_DB,
             user: POSTGRES_USER,
-            password: POSTGRES_PASSWORD,
+            password: POSTGRES_PASSWORD
         });
         return conn;
     };

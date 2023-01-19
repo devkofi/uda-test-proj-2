@@ -35,10 +35,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var User_1 = require("../models/User");
+Object.defineProperty(exports, "__esModule", { value: true });
+var user_1 = require("../models/user");
 var ENV = process.env.ENV;
-var user = new User_1.User(ENV);
+var user = new user_1.User(ENV);
 var signIn = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var sign;
     return __generator(this, function (_a) {
@@ -61,4 +61,4 @@ var user_routes = function (app) {
     app.post('/signin', signIn);
     app.post('/signup', signUp);
 };
-exports["default"] = user_routes;
+exports.default = user_routes;

@@ -5,7 +5,7 @@ import cors from 'cors';
 import bodyParser from "body-parser";
 import {BookType,Book} from "./models/book";
 import book_routes from "./handler/book";
-import user_routes from "./handler/User";
+import user_routes from "./handler/user";
 
 const app = express()
 const port = 3000;

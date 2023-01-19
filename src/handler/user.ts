@@ -1,5 +1,5 @@
 import express, {Request, Response} from 'express';
-import {User, SignIn, SignUp} from '../models/User';
+import {User, SignIn, SignUp} from '../models/user';
 import dotenv from 'dotenv';
 
 const {ENV} = process.env;

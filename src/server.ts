@@ -5,6 +5,7 @@ import cors from 'cors';
 import bodyParser from "body-parser";
 import {BookType,Book} from "./models/book";
 import book_routes from "./handler/book";
+import user_routes from "./handler/User";
 
 const app = express()
 const port = 3000;
@@ -27,7 +28,17 @@ app.get('/', (req: express.Request, res: express.Response)=>{
   res.sendFile(rootFolder + "index.html");
 });
 
+app.get('/signin', (req: express.Request, res: express.Response)=>{
+  res.sendFile(rootFolder + "login.html")
+});
+
+app.get('/signup', (req: express.Request, res: express.Response)=>{
+  res.sendFile(rootFolder + "signup.html")
+});
+
 book_routes(app);
+
+user_routes(app);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

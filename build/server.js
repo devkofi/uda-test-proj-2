@@ -8,6 +8,7 @@ var path_1 = __importDefault(require("path"));
 var cors_1 = __importDefault(require("cors"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var book_1 = __importDefault(require("./handler/book"));
+var User_1 = __importDefault(require("./handler/User"));
 var app = (0, express_1["default"])();
 var port = 3000;
 var ENV = process.env.ENV;
@@ -22,7 +23,14 @@ app.use(body_parser_1["default"].json());
 app.get('/', function (req, res) {
     res.sendFile(rootFolder + "index.html");
 });
+app.get('/signin', function (req, res) {
+    res.sendFile(rootFolder + "login.html");
+});
+app.get('/signup', function (req, res) {
+    res.sendFile(rootFolder + "signup.html");
+});
 (0, book_1["default"])(app);
+(0, User_1["default"])(app);
 app.listen(port, function () {
     console.log("Example app listening on port ".concat(port));
 });

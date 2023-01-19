@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/vendor/uikit.min.css">
+    <link rel="stylesheet" href="./css/styles.css">
+    <title>API Development</title>
+</head>
+<body>
+    <div class="uk-card uk-card-default uk-card-hover uk-card-body">
+        <form class="uk-form-horizontal uk-margin-large" method="post" action="/create">
+
+            <div class="uk-margin">
+                <label class="uk-form-label" for="title">Title</label>
+                <div class="uk-form-controls">
+                    <input name="title" class="uk-input" id="title" type="text" placeholder="Title">
+                </div>
+            </div>
+    
+            <div class="uk-margin">
+                <label class="uk-form-label" for="author">Author</label>
+                <div class="uk-form-controls">
+                    <input name="author" class="uk-input" id="author" type="text" placeholder="Author">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label" for="pages">Number of Pages</label>
+                <div class="uk-form-controls">
+                    <input name="pages" class="uk-input" id="pages" type="number" placeholder="Author">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label" for="type">Book Type</label>
+                <div class="uk-form-controls">
+                    <select name="type" class="uk-select" id="type">
+                        <option>Comedy</option>
+                        <option>Drama</option>
+                        <option>Action</option>
+                        <option>Horror</option>
+                        <option>Cartoons</option>
+                        <option>Hollywood</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <textarea name="summary" class="uk-textarea" rows="5" placeholder="Summary" aria-label="Textarea"></textarea>
+            </div>
+        
+        
+            <div class="uk-margin">
+                <button class="uk-button uk-button-primary uk-button-large" type="submit">Create</button>
+            </div>
+        
+        </form>
+    </div>
+    
+    <script src="./js/vendor/uikit.min.js"></script>
+    <script src="./js/vendor/uikit-icons.min.js"></script>
+</body>
+</html>

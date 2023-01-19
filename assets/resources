@@ -1,0 +1,178 @@
+
+________________
+Postgres WINDOWS
+________________
+
+command : psql -U default
+pass    : root
+
+______________________
+Postgres Meta Commands
+______________________
+
+https://dataschool.com/learn-sql/meta-commands-in-psql/
+
+___________________________
+Commonly Used Meta Commands
+___________________________
+
+\l List databases
+\c Connect to a database
+\dt Display Tables in a database
+\q Quit out of psql to normal terminal
+
+_______
+Queries
+_______
+
+-   CREATE DATABASE database_for_all_things;
+
+-   CREATE TABLE first_things (id SERIAL PRIMARY KEY, name VARCHAR(50), count integer);
+
+
+<-- CREATING A USER WITH PRIVILEDGES -->
+
+-   CREATE USER shopping_user WITH PASSWORD 'password123';
+-   CREATE DATABASE shopping;
+-   \c shopping
+-   GRANT ALL PRIVILEGES ON DATABASE shopping TO shopping_user;
+
+_____
+TOOLS
+_____
+dotenv              -   npm install dotenv --save 
+Typescript Watch    -   npm install tsc-watch --save-dev
+body-parser         -   npm install body-parser
+node postgres       -   npm install pg
+db-migrate          -   npm install -g db-migrate
+db-migrate-pg       -   npm install db-migrate-pg
+cors                -   npm install cors
+_____
+LINKS
+_____
+Typescript Watch    -   https://github.com/gilamran/tsc-watch
+node postgres       -   https://github.com/brianc/node-postgres
+dotenv              -   https://github.com/motdotla/dotenv
+body-parser         -   https://github.com/expressjs/body-parser
+db-migrate          -   https://github.com/db-migrate/node-db-migrate
+CORS                -   https://expressjs.com/en/resources/middleware/cors.html
+
+________________________
+CLI - DATABASE MIGRATION
+________________________
+
+Create Migration     -   db-migrate create sample-migration --sql-file
+Bring Migration Up   -   db-migrate up
+Bring Migration Down -   db-migrate down
+
+** Add the SQL you need to the up and down sql files **
+______________________________
+DATABASE.JSON (ROOT DIRECTORY)
+______________________________
+
+{
+  "dev": {
+    "driver": "pg",
+    "host": "127.0.0.1",
+    "database": "fantasy_worlds",
+    "user": "magical_user",
+    "password": "password123"
+  },
+  
+  "test": {
+    "driver": "pg",
+    "host": "127.0.0.1",
+    "database": "fantasy_worlds_test",
+    "user": "test_user",
+    "password": "password123"
+  }
+}
+
+____________
+PACKAGE.JSON
+____________
+"watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./build --onSuccess \"node ./dist/server.js\" --onFailure \"echo Beep! Compilation Failed\""
+
+
+_______
+SAMPLES
+_______
+
+A) .env
+
+--
+POSTGRES_HOST=127.0.0.1
+POSTGRES_DB=full_stack_dev
+POSTGRES_USER=full_stack_user
+POSTGRES_PASSWORD=password123
+--
+
+
+B) Database connection file
+
+--
+import dotenv from 'dotenv'
+import { Pool } from 'pg'
+
+dotenv.config()
+
+const {
+    POSTGRES_HOST,
+    POSTGRES_DB,
+    POSTGRES_USER,
+    POSTGRES_PASSWORD,
+} = process.env 
+
+const client = new Pool({
+    host: POSTGRES_HOST,
+    database: POSTGRES_DB,
+    user: POSTGRES_USER,
+    password: POSTGRES_PASSWORD,
+})
+
+export default client
+--
+
+
+C) CRUD actions in NodeJS
+
+1. Create a folder in src/models
+
+2. Create name of the model eg.sample-migrate.ts which should have the content below
+
+--
+import Client from "../database";
+
+/*Types for the database table*/
+export type Weapon = {
+  id: Number;
+  name: string;
+  type: string;
+  weight: number
+}
+
+/*This class will be the representation of the database denotes every row that is created*/
+export class MythicalWeaponStore{
+
+  //Read from the database
+  async index(): Promise<Weapon[]>{
+    try{
+      //Establish connection
+      const conn = await Client.connect();
+
+      //Create a query syntax
+      const sql = 'SELECT * FROM table_name';
+
+      //Run query on the database
+      const result = await conn.query(sql);
+
+      //Close database connection
+      conn.release();
+
+      return result.rows;
+    } catch(err: Error){
+      throw new Error(`Cannot Connect to the database ${err}`);
+    }
+  }
+}
+--

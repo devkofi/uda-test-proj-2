@@ -47,15 +47,17 @@ node postgres       -   npm install pg
 db-migrate          -   npm install -g db-migrate
 db-migrate-pg       -   npm install db-migrate-pg
 cors                -   npm install cors
+bcrypt              -   npm install bcrypt
 _____
 LINKS
 _____
-Typescript Watch    -   https://github.com/gilamran/tsc-watch
-node postgres       -   https://github.com/brianc/node-postgres
-dotenv              -   https://github.com/motdotla/dotenv
-body-parser         -   https://github.com/expressjs/body-parser
-db-migrate          -   https://github.com/db-migrate/node-db-migrate
-CORS                -   https://expressjs.com/en/resources/middleware/cors.html
+Typescript Watch            -   https://github.com/gilamran/tsc-watch
+node postgres               -   https://github.com/brianc/node-postgres
+dotenv                      -   https://github.com/motdotla/dotenv
+body-parser                 -   https://github.com/expressjs/body-parser
+db-migrate                  -   https://github.com/db-migrate/node-db-migrate
+CORS                        -   https://expressjs.com/en/resources/middleware/cors.html
+bcrypt (Password hashing)   -   https://github.com/kelektiv/node.bcrypt.js   
 
 ________________________
 CLI - DATABASE MIGRATION

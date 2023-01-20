@@ -40,39 +40,44 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.User = void 0;
+var connection_1 = require("../handler/connection");
+var bcrypt_1 = __importDefault(require("bcrypt"));
 var dotenv_1 = __importDefault(require("dotenv"));
-var pg_1 = require("pg");
 dotenv_1["default"].config();
-var _a = process.env, POSTGRES_HOST = _a.POSTGRES_HOST, POSTGRES_PORT = _a.POSTGRES_PORT, POSTGRES_DB = _a.POSTGRES_DB, POSTGRES_TEST_DB = _a.POSTGRES_TEST_DB, POSTGRES_USER = _a.POSTGRES_USER, POSTGRES_PASSWORD = _a.POSTGRES_PASSWORD, ENV = _a.ENV;
-console.log(ENV);
+var _a = process.env, BCRYPT_PEPPER = _a.BCRYPT_PEPPER, SALT_ROUNDS = _a.SALT_ROUNDS;
 var User = /** @class */ (function () {
     function User(environment) {
+        this.pepper = BCRYPT_PEPPER;
+        this.salt = SALT_ROUNDS;
     }
     User.prototype.signUp = function (signUp) {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, sql, result, output, err_1;
+            var conn, sql, hash, result, output, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 4, , 5]);
-                        conn = this.connection();
+                        _a.trys.push([0, 5, , 6]);
+                        conn = (0, connection_1.connection)();
                         return [4 /*yield*/, conn.connect()];
                     case 1:
                         _a.sent();
                         sql = 'INSERT INTO users(name, email, password) VALUES ($1, $2, $3)';
-                        return [4 /*yield*/, conn.query(sql, [signUp.name, signUp.email, signUp.password])];
+                        return [4 /*yield*/, bcrypt_1["default"].hash(signUp.password + this.pepper, parseInt(this.salt))];
                     case 2:
+                        hash = _a.sent();
+                        return [4 /*yield*/, conn.query(sql, [signUp.name, signUp.email, hash])];
+                    case 3:
                         result = _a.sent();
                         return [4 /*yield*/, conn.query('SELECT * FROM users WHERE email=($1)', [signUp.email])];
-                    case 3:
+                    case 4:
                         output = _a.sent();
                         conn.end();
                         console.log(output.rows);
                         return [2 /*return*/, output.rows];
-                    case 4:
+                    case 5:
                         err_1 = _a.sent();
                         throw new Error("Could SignUp User. Error: ".concat(err_1));
-                    case 5: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
@@ -84,7 +89,7 @@ var User = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        conn = this.connection();
+                        conn = (0, connection_1.connection)();
                         return [4 /*yield*/, conn.connect()];
                     case 1:
                         _a.sent();
@@ -109,7 +114,7 @@ var User = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        conn = this.connection();
+                        conn = (0, connection_1.connection)();
                         return [4 /*yield*/, conn.connect()];
                     case 1:
                         _a.sent();
@@ -127,21 +132,34 @@ var User = /** @class */ (function () {
             });
         });
     };
-    User.prototype.connection = function () {
-        var conn = ENV === "dev" ? new pg_1.Pool({
-            host: POSTGRES_HOST,
-            port: Number(POSTGRES_PORT),
-            database: POSTGRES_DB,
-            user: POSTGRES_USER,
-            password: POSTGRES_PASSWORD
-        }) : new pg_1.Pool({
-            host: POSTGRES_HOST,
-            port: Number(POSTGRES_PORT),
-            database: POSTGRES_TEST_DB,
-            user: POSTGRES_USER,
-            password: POSTGRES_PASSWORD
+    User.prototype.authenticate = function (auth) {
+        return __awaiter(this, void 0, void 0, function () {
+            var conn, sql, result, user;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        conn = (0, connection_1.connection)();
+                        return [4 /*yield*/, conn.connect()];
+                    case 1:
+                        _a.sent();
+                        sql = 'SELECT password from users WHERE email=($1)';
+                        return [4 /*yield*/, conn.query(sql, [auth.email])];
+                    case 2:
+                        result = _a.sent();
+                        conn.end();
+                        console.log(auth.password + this.pepper);
+                        console.log(result.rows[0]);
+                        if (result.rows.length) {
+                            user = result.rows[0];
+                            console.log(user);
+                            if (bcrypt_1["default"].compareSync(auth.password + this.pepper, user.password)) {
+                                return [2 /*return*/, user];
+                            }
+                        }
+                        return [2 /*return*/, null];
+                }
+            });
         });
-        return conn;
     };
     return User;
 }());

@@ -1,20 +1,18 @@
 import { doesNotMatch } from 'assert';
-import dotenv from 'dotenv'
+import {connection} from '../handler/connection'
 import { connect } from 'http2';
 import {Pool, Client} from 'pg';
+import bcrypt from 'bcrypt';
+import { Sign } from 'crypto';
+
+
+import dotenv from 'dotenv'
 
 dotenv.config()
 const {
-    POSTGRES_HOST,
-    POSTGRES_PORT,
-    POSTGRES_DB,
-    POSTGRES_TEST_DB,
-    POSTGRES_USER,
-    POSTGRES_PASSWORD,
-    ENV
-} = process.env 
-
-console.log(ENV)
+    BCRYPT_PEPPER,
+    SALT_ROUNDS,
+} = process.env
 
 export type SignUp = {
     id?: number;
@@ -30,17 +28,21 @@ export type SignIn = {
 }
 
 export class User{
-
+    pepper: string;
+    salt: string;
     constructor(environment: string){
-        
+        this.pepper = (BCRYPT_PEPPER as unknown) as string;
+        this.salt = (SALT_ROUNDS as unknown) as string;
     }
     
     async signUp(signUp: SignUp): Promise<SignUp[]>{
         try{
-            const conn = this.connection();
+            const conn = connection();
+
             await conn.connect();
             const sql = 'INSERT INTO users(name, email, password) VALUES ($1, $2, $3)';
-            const result = await conn.query(sql,[signUp.name, signUp.email, signUp.password]);
+            const hash = await bcrypt.hash(signUp.password + this.pepper, parseInt(this.salt));
+            const result = await conn.query(sql,[signUp.name, signUp.email, hash]);
             const output = await conn.query('SELECT * FROM users WHERE email=($1)', [signUp.email]);
             conn.end();
             console.log(output.rows)
@@ -54,7 +56,7 @@ export class User{
 
     async signIn(signIn: SignIn): Promise<SignIn[]>{
         try{
-            const conn = this.connection();
+            const conn = connection();
             await conn.connect();
             const sql = 'SELECT email, password FROM users WHERE email=($1) AND password=($2)';
             const result = await conn.query(sql,[signIn.email, signIn.password]);
@@ -68,7 +70,7 @@ export class User{
     }
 
     async deleteUser(id: string): Promise<SignUp[]>{
-        const conn = this.connection();
+        const conn = connection();
         await conn.connect();
         const sql = 'DELETE FROM users WHERE id=($1)';
         const result = await conn.query(sql, [id]);
@@ -78,24 +80,29 @@ export class User{
         return output.rows;
     }
 
+    async authenticate(auth: SignIn): Promise<SignIn | null>{
 
-    connection(): Pool{
-        const conn = ENV === "dev" ? new Pool({
-            host: POSTGRES_HOST,
-            port: Number(POSTGRES_PORT),
-            database: POSTGRES_DB,
-            user: POSTGRES_USER,
-            password: POSTGRES_PASSWORD,
-        }) : new Pool({
-            host: POSTGRES_HOST,
-            port: Number(POSTGRES_PORT),
-            database: POSTGRES_TEST_DB,
-            user: POSTGRES_USER,
-            password: POSTGRES_PASSWORD,
-        });
+        const conn = connection();
+        await conn.connect();
+        const sql = 'SELECT password from users WHERE email=($1)';
+        const result = await conn.query(sql,[auth.email]);
+        conn.end();
+        console.log(auth.password+this.pepper);
+        console.log(result.rows[0]);
 
-        return conn;
+        if(result.rows.length){
+            const user = result.rows[0]
+            console.log(user);
+
+            if(bcrypt.compareSync(auth.password+this.pepper, user.password)){
+                return user;
+            }
+        }
+
+        return null;
     }
+
+    
 
 
 }

@@ -35,9 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 var user_1 = require("../models/user");
-var ENV = process.env.ENV;
+var bcrypt_1 = __importDefault(require("bcrypt"));
+var _a = process.env, ENV = _a.ENV, BCRYPT_PEPPER = _a.BCRYPT_PEPPER, SALT_ROUNDS = _a.SALT_ROUNDS;
 var user = new user_1.User(ENV);
 var signIn = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var sign;
@@ -66,8 +70,21 @@ var deleteUser = function (req, res) { return __awaiter(void 0, void 0, void 0, 
         return [2 /*return*/];
     });
 }); };
+var authenticate = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var auth;
+    return __generator(this, function (_a) {
+        auth = user.authenticate({ email: req.body.email, password: req.body.password }).then(function (item) {
+            if (bcrypt_1["default"].compareSync(req.body.password + BCRYPT_PEPPER, item === null || item === void 0 ? void 0 : item.password)) {
+                console.log('Password: ' + (item === null || item === void 0 ? void 0 : item.password));
+                res.send('Connected Successfully');
+            }
+            //res.json(item);
+        });
+        return [2 /*return*/];
+    });
+}); };
 var user_routes = function (app) {
-    app.post('/signin', signIn);
+    app.post('/authenticate', authenticate);
     app.post('/signup', signUp);
     app["delete"]('/delete/:id', deleteUser);
 };

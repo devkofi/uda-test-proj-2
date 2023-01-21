@@ -1,8 +1,9 @@
-import express, {Request, Response} from 'express';
+import express, {Request, Response, NextFunction} from 'express';
 import {BookType, Book} from '../models/book';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
-const {ENV} = process.env;
+const {ENV, TOKEN_SECRET} = process.env;
 
 const createBook = new Book((ENV as unknown) as string);
 
@@ -32,6 +33,8 @@ const create = async (req: Request, res: Response): Promise<void> =>{
         total_pages:(req.body.pages as unknown) as number,
         summary: (req.body.summary as unknown) as string 
     };
+
+    
     const book = createBook.create(newBook).then((item)=>{
         res.json(item);
     });
@@ -44,16 +47,52 @@ const deleteBook = async (req: Request, res: Response): Promise<void> =>{
     });
 }
 
+const verifyAuthToken = (req: Request, res: Response, next: NextFunction) =>{
+    const token = req.cookies.token;
+    
+    try {
+        if(typeof token !== 'undefined'){
+            const verify = async () =>{
+                await jwt.verify(token, (TOKEN_SECRET as unknown) as string);
+            }
+            next()
+        }
+        else{
+            res.redirect("/signin")
+        }
+        
+    } catch (error) {
+        console.log(error)
+        res.clearCookie("token");
+        res.redirect("/signin");
+    }
+
+}
+
+
 const book_routes = (app: express.Application): void =>{
-    app.get('/index', index);
-    app.get('/show', show);
-    app.get('/update', update);
-    app.post('/create', create);
-    app.delete('/delete/:id/', deleteBook);
+    app.get('/index', verifyAuthToken, index);
+    app.get('/show', verifyAuthToken, show);
+    app.patch('/update', verifyAuthToken, update);
+    app.post('/create', verifyAuthToken, create);
+    app.delete('/delete/:id/', verifyAuthToken, deleteBook);
 }
 
 export default book_routes;
 
   
-  
+// const verifyAuthToken = (req: Request, res: Response, next: express.NextFunction) => {
+    
+//     try {
+//         const authorizationHeader = req.headers.authorization;
+//         const token = ((authorizationHeader as unknown) as string).split(' ')[1]
+//         jwt.verify(token, (process.env.TOKEN_SECRET as unknown) as string);
+//         next();
+//     } catch(err) {
+//         res.status(401)
+//         res.json('Access denied, invalid token')
+//         return
+//     }
+
+// }
 

@@ -35,9 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 var book_1 = require("../models/book");
-var ENV = process.env.ENV;
+var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var _a = process.env, ENV = _a.ENV, TOKEN_SECRET = _a.TOKEN_SECRET;
 var createBook = new book_1.Book(ENV);
 var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var book;
@@ -91,11 +95,49 @@ var deleteBook = function (req, res) { return __awaiter(void 0, void 0, void 0, 
         return [2 /*return*/];
     });
 }); };
+var verifyAuthToken = function (req, res, next) {
+    var token = req.cookies.token;
+    try {
+        if (typeof token !== 'undefined') {
+            var verify = function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, jsonwebtoken_1["default"].verify(token, TOKEN_SECRET)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); };
+            next();
+        }
+        else {
+            res.redirect("/signin");
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.clearCookie("token");
+        res.redirect("/signin");
+    }
+};
 var book_routes = function (app) {
-    app.get('/index', index);
-    app.get('/show', show);
-    app.get('/update', update);
-    app.post('/create', create);
-    app["delete"]('/delete/:id/', deleteBook);
+    app.get('/index', verifyAuthToken, index);
+    app.get('/show', verifyAuthToken, show);
+    app.patch('/update', verifyAuthToken, update);
+    app.post('/create', verifyAuthToken, create);
+    app["delete"]('/delete/:id/', verifyAuthToken, deleteBook);
 };
 exports["default"] = book_routes;
+// const verifyAuthToken = (req: Request, res: Response, next: express.NextFunction) => {
+//     try {
+//         const authorizationHeader = req.headers.authorization;
+//         const token = ((authorizationHeader as unknown) as string).split(' ')[1]
+//         jwt.verify(token, (process.env.TOKEN_SECRET as unknown) as string);
+//         next();
+//     } catch(err) {
+//         res.status(401)
+//         res.json('Access denied, invalid token')
+//         return
+//     }
+// }

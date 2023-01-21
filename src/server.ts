@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response, NextFunction} from "express";
 import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -6,15 +6,16 @@ import bodyParser from "body-parser";
 import {BookType,Book} from "./models/book";
 import book_routes from "./handler/book";
 import user_routes from "./handler/user";
-
+import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
 const app = express()
 const port = 3000;
-
-
 
 const {ENV}= process.env;
 const rootFolder: string = path.resolve(__dirname) + path.normalize("/public/");
 app.use(express.static(rootFolder));
+app.use(cookieParser());
+
 //Enable cors for all routes
 app.use(cors());
 

@@ -9,11 +9,13 @@ var cors_1 = __importDefault(require("cors"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var book_1 = __importDefault(require("./handler/book"));
 var user_1 = __importDefault(require("./handler/user"));
+var cookie_parser_1 = __importDefault(require("cookie-parser"));
 var app = (0, express_1["default"])();
 var port = 3000;
 var ENV = process.env.ENV;
 var rootFolder = path_1["default"].resolve(__dirname) + path_1["default"].normalize("/public/");
 app.use(express_1["default"].static(rootFolder));
+app.use((0, cookie_parser_1["default"])());
 //Enable cors for all routes
 app.use((0, cors_1["default"])());
 // parse application/x-www-form-urlencoded

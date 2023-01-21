@@ -38,18 +38,60 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 var connection_1 = require("../handler/connection");
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1["default"].config();
+dotenv_1.default.config();
 var _a = process.env, BCRYPT_PEPPER = _a.BCRYPT_PEPPER, SALT_ROUNDS = _a.SALT_ROUNDS;
 var User = /** @class */ (function () {
     function User(environment) {
         this.pepper = BCRYPT_PEPPER;
         this.salt = SALT_ROUNDS;
     }
+    User.prototype.index = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var conn, sql, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        conn = (0, connection_1.connection)();
+                        return [4 /*yield*/, conn.connect()];
+                    case 1:
+                        _a.sent();
+                        sql = 'SELECT * FROM users';
+                        return [4 /*yield*/, conn.query(sql)];
+                    case 2:
+                        result = _a.sent();
+                        conn.end();
+                        console.log(result.rows);
+                        return [2 /*return*/, result.rows];
+                }
+            });
+        });
+    };
+    User.prototype.show = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var conn, sql, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        conn = (0, connection_1.connection)();
+                        return [4 /*yield*/, conn.connect()];
+                    case 1:
+                        _a.sent();
+                        sql = 'SELECT * FROM users WHERE id=($1)';
+                        return [4 /*yield*/, conn.query(sql, [id])];
+                    case 2:
+                        result = _a.sent();
+                        conn.end();
+                        console.log(result.rows);
+                        return [2 /*return*/, result.rows];
+                }
+            });
+        });
+    };
     User.prototype.signUp = function (signUp) {
         return __awaiter(this, void 0, void 0, function () {
             var conn, sql, hash, result, output, err_1;
@@ -62,7 +104,7 @@ var User = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         sql = 'INSERT INTO users(name, email, password) VALUES ($1, $2, $3)';
-                        return [4 /*yield*/, bcrypt_1["default"].hash(signUp.password + this.pepper, parseInt(this.salt))];
+                        return [4 /*yield*/, bcrypt_1.default.hash(signUp.password + this.pepper, parseInt(this.salt))];
                     case 2:
                         hash = _a.sent();
                         return [4 /*yield*/, conn.query(sql, [signUp.name, signUp.email, hash])];
@@ -142,7 +184,7 @@ var User = /** @class */ (function () {
                         return [4 /*yield*/, conn.connect()];
                     case 1:
                         _a.sent();
-                        sql = 'SELECT password from users WHERE email=($1)';
+                        sql = 'SELECT email,password from users WHERE email=($1)';
                         return [4 /*yield*/, conn.query(sql, [auth.email])];
                     case 2:
                         result = _a.sent();
@@ -152,9 +194,10 @@ var User = /** @class */ (function () {
                         if (result.rows.length) {
                             user = result.rows[0];
                             console.log(user);
-                            if (bcrypt_1["default"].compareSync(auth.password + this.pepper, user.password)) {
-                                return [2 /*return*/, user];
-                            }
+                            // if(bcrypt.compareSync(auth.password+this.pepper, user.password)){
+                            //     return user;
+                            // }
+                            return [2 /*return*/, user];
                         }
                         return [2 /*return*/, null];
                 }

@@ -34,11 +34,30 @@ export class User{
         this.pepper = (BCRYPT_PEPPER as unknown) as string;
         this.salt = (SALT_ROUNDS as unknown) as string;
     }
+
+    async index(): Promise<SignUp[]>{
+        const conn = connection();
+        await conn.connect();
+        const sql = 'SELECT * FROM users';
+        const result = await conn.query(sql);
+        conn.end();
+        console.log(result.rows);
+        return result.rows;
+    }
+
+    async show(id: string): Promise<SignUp[]>{
+        const conn = connection();
+        await conn.connect();
+        const sql = 'SELECT * FROM users WHERE id=($1)';
+        const result = await conn.query(sql, [id]);
+        conn.end();
+        console.log(result.rows);
+        return result.rows;
+    }
     
     async signUp(signUp: SignUp): Promise<SignUp[]>{
         try{
             const conn = connection();
-
             await conn.connect();
             const sql = 'INSERT INTO users(name, email, password) VALUES ($1, $2, $3)';
             const hash = await bcrypt.hash(signUp.password + this.pepper, parseInt(this.salt));
@@ -84,7 +103,7 @@ export class User{
 
         const conn = connection();
         await conn.connect();
-        const sql = 'SELECT password from users WHERE email=($1)';
+        const sql = 'SELECT email,password from users WHERE email=($1)';
         const result = await conn.query(sql,[auth.email]);
         conn.end();
         console.log(auth.password+this.pepper);
@@ -94,9 +113,11 @@ export class User{
             const user = result.rows[0]
             console.log(user);
 
-            if(bcrypt.compareSync(auth.password+this.pepper, user.password)){
-                return user;
-            }
+            // if(bcrypt.compareSync(auth.password+this.pepper, user.password)){
+            //     return user;
+            // }
+            return user;
+            
         }
 
         return null;

@@ -37,6 +37,13 @@ _______
 -   \c shopping
 -   GRANT ALL PRIVILEGES ON DATABASE shopping TO shopping_user;
 
+<-- CREATING A DATABASE WITH USER WITH PRIVILEDGES -->
+
+-   CREATE USER full_stack_user WITH PASSWORD 'password123';
+-   CREATE DATABASE full_stack_dev;
+-   \c full_stack_dev
+-   GRANT ALL PRIVILEGES ON DATABASE full_stack_dev TO full_stack_user;
+
 _____
 TOOLS
 _____
@@ -48,6 +55,8 @@ db-migrate          -   npm install -g db-migrate
 db-migrate-pg       -   npm install db-migrate-pg
 cors                -   npm install cors
 bcrypt              -   npm install bcrypt
+jwt                 -   npm install jsonwebtoken
+cookie-parser       -   npm install cookie-parser
 _____
 LINKS
 _____
@@ -57,7 +66,9 @@ dotenv                      -   https://github.com/motdotla/dotenv
 body-parser                 -   https://github.com/expressjs/body-parser
 db-migrate                  -   https://github.com/db-migrate/node-db-migrate
 CORS                        -   https://expressjs.com/en/resources/middleware/cors.html
-bcrypt (Password hashing)   -   https://github.com/kelektiv/node.bcrypt.js   
+bcrypt (Password hashing)   -   https://github.com/kelektiv/node.bcrypt.js
+jwt                         -   https://jwt.io/
+cookie-parser               -   https://github.com/expressjs/cookie-parser
 
 ________________________
 CLI - DATABASE MIGRATION
@@ -100,8 +111,9 @@ _______
 SAMPLES
 _______
 
+<<=======================>>
 A) .env
-
+<<=======================>>
 --
 POSTGRES_HOST=127.0.0.1
 POSTGRES_DB=full_stack_dev
@@ -109,9 +121,9 @@ POSTGRES_USER=full_stack_user
 POSTGRES_PASSWORD=password123
 --
 
-
+<<=======================>>
 B) Database connection file
-
+<<=======================>>
 --
 import dotenv from 'dotenv'
 import { Pool } from 'pg'
@@ -135,8 +147,9 @@ const client = new Pool({
 export default client
 --
 
-
+<<=======================>>
 C) CRUD actions in NodeJS
+<<=======================>>
 
 1. Create a folder in src/models
 
@@ -178,3 +191,70 @@ export class MythicalWeaponStore{
   }
 }
 --
+<<===============>>
+D) BCRYPT HASHING
+<<===============>>
+--
+//Create a hash
+const hash = bcrypt.hashSync(
+      u.password + pepper, 
+      parseInt(saltRounds)
+   );
+
+//Validating passwords at user sign in
+bcrypt.compareSync(password+pepper, user.password_digest);
+--
+
+
+<<===========>>
+E) CREATE USER
+<<===========>>
+
+async create(u: User): Promise<User> {
+    try {
+      // @ts-ignore
+      const conn = await Client.connect()
+      const sql = 'INSERT INTO users (username, password_digest) VALUES($1, $2) RETURNING *'
+
+      const hash = bcrypt.hashSync(
+        u.password + pepper, 
+        parseInt(saltRounds)
+      );
+
+      const result = await conn.query(sql, [u.username, hash])
+      const user = result.rows[0]
+
+      conn.release()
+
+      return user
+    } catch(err) {
+      throw new Error(`unable create user (${u.username}): ${err}`)
+    } 
+  }
+
+
+<<=================>>
+F) AUTHENTICATE USER
+<<=================>>
+
+async authenticate(username: string, password: string): Promise<User | null> {
+    const conn = await Client.connect()
+    const sql = 'SELECT password_digest FROM users WHERE username=($1)'
+
+    const result = await conn.query(sql, [username])
+
+    console.log(password+pepper)
+
+    if(result.rows.length) {
+
+      const user = result.rows[0]
+
+      console.log(user)
+
+      if (bcrypt.compareSync(password+pepper, user.password_digest)) {
+        return user
+      }
+    }
+
+    return null
+  }

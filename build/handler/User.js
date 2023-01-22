@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var user_1 = require("../models/user");
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -46,8 +46,8 @@ var bcrypt_1 = __importDefault(require("bcrypt"));
 var path_1 = __importDefault(require("path"));
 var _a = process.env, ENV = _a.ENV, BCRYPT_PEPPER = _a.BCRYPT_PEPPER, TOKEN_SECRET = _a.TOKEN_SECRET, SALT_ROUNDS = _a.SALT_ROUNDS;
 var user = new user_1.User(ENV);
-var rootFolder = path_1["default"].resolve("./build") + path_1["default"].normalize("/public/");
-(0, express_1["default"])().use(express_1["default"].static(rootFolder));
+var rootFolder = path_1.default.resolve("./build") + path_1.default.normalize("/public/");
+(0, express_1.default)().use(express_1.default.static(rootFolder));
 var index = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var index;
     return __generator(this, function (_a) {
@@ -101,7 +101,7 @@ var signUp = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 return [4 /*yield*/, user.signUp(tempuser)];
             case 2:
                 newUser = _a.sent();
-                token = jsonwebtoken_1["default"].sign({ user: newUser }, process.env.TOKEN_SECRET);
+                token = jsonwebtoken_1.default.sign({ user: newUser }, process.env.TOKEN_SECRET);
                 console.log(token);
                 res.json(token);
                 return [3 /*break*/, 4];
@@ -130,11 +130,12 @@ var authenticate = function (req, res) { return __awaiter(void 0, void 0, void 0
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, user.authenticate({ email: req.body.email, password: req.body.password }).then(function (item) {
-                        var token = jsonwebtoken_1["default"].sign({ user: item }, process.env.TOKEN_SECRET, { algorithm: 'HS256' });
+                        var token = jsonwebtoken_1.default.sign({ user: item }, process.env.TOKEN_SECRET, { algorithm: 'HS256' });
                         res.cookie('token', token, {
                             httpOnly: true,
                             //secure: true,
-                            maxAge: (1000 * 60)
+                            maxAge: (1000 * 60),
+                            //signed: true
                         });
                         console.log(token);
                         var header = function () { return res.set('authorization', token); };
@@ -146,7 +147,7 @@ var authenticate = function (req, res) { return __awaiter(void 0, void 0, void 0
                         //res.json(token);
                         // const hash = bcrypt.hash(((item?.password) as string) + BCRYPT_PEPPER, parseInt((SALT_ROUNDS as unknown) as string)).then((item)=>{
                         // });
-                        if (bcrypt_1["default"].compareSync(req.body.password + BCRYPT_PEPPER, item === null || item === void 0 ? void 0 : item.password)) {
+                        if (bcrypt_1.default.compareSync(req.body.password + BCRYPT_PEPPER, item === null || item === void 0 ? void 0 : item.password)) {
                             res.status(200);
                             res.redirect('/');
                         }
@@ -174,7 +175,7 @@ var verifyAuthToken = function (req, res, next) {
             var verify = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, jsonwebtoken_1["default"].verify(token, TOKEN_SECRET)];
+                        case 0: return [4 /*yield*/, jsonwebtoken_1.default.verify(token, TOKEN_SECRET)];
                         case 1:
                             _a.sent();
                             return [2 /*return*/];
@@ -197,10 +198,10 @@ var user_routes = function (app) {
     app.get('/users', verifyAuthToken, index);
     app.get('/users/:id', verifyAuthToken, show);
     app.post('/users', signUp);
-    app["delete"]('/users', deleteUser);
+    app.delete('/users', deleteUser);
     app.post('/users/authenticate', authenticate);
 };
-exports["default"] = user_routes;
+exports.default = user_routes;
 // const verifyAuthToken = (req: Request, res: Response, next: NextFunction) => {
 //         const authorizationHeader = req.headers['authorization'];
 //         const token = ((authorizationHeader as unknown) as string).split(' ')[1]

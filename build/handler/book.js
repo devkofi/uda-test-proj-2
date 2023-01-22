@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var book_1 = require("../models/book");
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var _a = process.env, ENV = _a.ENV, TOKEN_SECRET = _a.TOKEN_SECRET;
@@ -89,7 +89,7 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
 var deleteBook = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var book;
     return __generator(this, function (_a) {
-        book = createBook["delete"](req.params.id).then(function (item) {
+        book = createBook.delete(req.params.id).then(function (item) {
             res.send('Successfully Deleted item');
         });
         return [2 /*return*/];
@@ -102,7 +102,7 @@ var verifyAuthToken = function (req, res, next) {
             var verify = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, jsonwebtoken_1["default"].verify(token, TOKEN_SECRET)];
+                        case 0: return [4 /*yield*/, jsonwebtoken_1.default.verify(token, TOKEN_SECRET)];
                         case 1:
                             _a.sent();
                             return [2 /*return*/];
@@ -126,9 +126,9 @@ var book_routes = function (app) {
     app.get('/show', verifyAuthToken, show);
     app.patch('/update', verifyAuthToken, update);
     app.post('/create', verifyAuthToken, create);
-    app["delete"]('/delete/:id/', verifyAuthToken, deleteBook);
+    app.delete('/delete/:id/', verifyAuthToken, deleteBook);
 };
-exports["default"] = book_routes;
+exports.default = book_routes;
 // const verifyAuthToken = (req: Request, res: Response, next: express.NextFunction) => {
 //     try {
 //         const authorizationHeader = req.headers.authorization;

@@ -70,6 +70,10 @@ bcrypt (Password hashing)   -   https://github.com/kelektiv/node.bcrypt.js
 jwt                         -   https://jwt.io/
 cookie-parser               -   https://github.com/expressjs/cookie-parser
 
+______
+OTHERS
+______
+Node Path API               -   https://nodejs.org/docs/latest/api/path.html
 ________________________
 CLI - DATABASE MIGRATION
 ________________________
